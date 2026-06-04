@@ -192,11 +192,14 @@ export default function ScenarioA() {
 
       setSessionId(sid)
 
-      // Open WebSocket through Next.js/Vercel proxy — browser connects to same
-      // origin so protocol matches the page (wss:// on HTTPS, ws:// on HTTP)
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      // Connect directly to the backend WebSocket — Vercel's rewrite proxy does
+      // not reliably forward WebSocket upgrade requests to external origins.
       const apiKey = process.env.NEXT_PUBLIC_WS_API_KEY ?? ''
-      const wsUrl = `${wsProtocol}//${window.location.host}/ws/v1/listen?session_id=${sid}&api_key=${encodeURIComponent(apiKey)}`
+      const wsBase = process.env.NEXT_PUBLIC_WS_BASE ?? (() => {
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+        return `${proto}//${window.location.host}`
+      })()
+      const wsUrl = `${wsBase}/v1/listen?session_id=${sid}&api_key=${encodeURIComponent(apiKey)}`
 
       cleanup()
       const ws = new WebSocket(wsUrl)
