@@ -325,14 +325,8 @@ export default function ScenarioB() {
         throw new Error('Server response missing handshakeToken or webSocketUrl')
       }
 
-      // Route through Next.js/Vercel proxy — extract path from backend URL,
-      // prepend /ws so the rewrite rule picks it up
-      const { pathname, search } = new URL(webSocketUrl)
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${wsProtocol}//${window.location.host}/ws${pathname}${search}`
-
       cleanupWs()
-      const ws = new WebSocket(wsUrl)
+      const ws = new WebSocket(webSocketUrl)
       wsRef.current = ws
 
       ws.onopen = () => {
