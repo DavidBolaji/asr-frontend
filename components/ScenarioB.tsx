@@ -354,10 +354,27 @@ export default function ScenarioB() {
               confidence: attrs.confidence ?? 0,
               startTime: attrs.startTime,
               endTime: attrs.endTime,
+              kind: 'transcript',
             }
             if (item.text.trim()) {
               setTranscripts((prev) => [...prev, item])
             }
+          } else if (frame.event === 'audio_event') {
+            const attrs = frame.data?.attributes ?? {}
+            const classification = attrs.audioClassification ?? {}
+            const item: TranscriptItem = {
+              id: frame.data?.id ?? `${Date.now()}-${Math.random()}`,
+              text: attrs.message || 'Audio event received',
+              language: classification.bucket || 'audio',
+              timestamp: Date.now(),
+              confidence: classification.topScore ?? 0,
+              startTime: attrs.startTime,
+              endTime: attrs.endTime,
+              kind: 'audio_event',
+              eventType: attrs.eventType || 'unknown_audio',
+              topLabel: classification.topLabel,
+            }
+            setTranscripts((prev) => [...prev, item])
           } else if (frame.errors) {
             setError(frame.errors[0]?.detail || frame.errors[0]?.title || 'Transcription error from server')
             setStatus('error')

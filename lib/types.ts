@@ -6,6 +6,9 @@ export interface TranscriptItem {
   confidence: number
   startTime?: number
   endTime?: number
+  kind?: 'transcript' | 'audio_event'
+  eventType?: string
+  topLabel?: string
 }
 
 export type StreamStatus = 'idle' | 'connecting' | 'live' | 'error' | 'stopped'
